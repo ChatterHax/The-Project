@@ -74,32 +74,45 @@ class App extends React.Component {
     this.getUsersFromFacebook = this.getUsersFromFacebook.bind(this);
   }
 
+  componentWillMount() {
+    this.updateDimensions();
+    window.addEventListener('resize', this.updateDimensions.bind(this));
+    Util.verify(this.verifyAuthentication);
+  }
+
+  componentDidMount() {
+    this.getRecentTrip();
+  }
+
   verifyAuthentication(userInfo) {
-    console.log(userInfo);
+    console.log('verify members 1', this.state.members);
+    console.log('userInfo', userInfo.name);
+    var temp = this.state.members;
+    if (userInfo.name !== undefined) {
+      temp.push([userInfo.name]);
+    }
     this.setState({
       isAuthenticated: userInfo.isAuthenitcated,
       username: userInfo.name || '',
-      members: userInfo.name !== undefined ? this.state.members.concat([[userInfo.name]]) : this.state.members,
-      fb_id: userInfo.fb_id || '',
-      photoUrl: userInfo.picture
+      members: temp,
+      fb_id: userInfo.fb_id || ''
     });
+    console.log('verify members 2', this.state.members);
   }
 
   handleClickLogout(event) {
     event.preventDefault();
     Util.logout(this.verifyAuthentication);
   }
-
+ 
   addItem (itemArray) {
     if (this.state.name === '' || this.state.amount === '') {
       console.log('Please include item and price');
     } else {
+      var temp = this.state.items;
+      temp.push([{name: this.state.name, amount: this.state.amount, members: []}]);
       this.setState({
-        items: this.state.items.concat([[{
-          name: this.state.name,
-          amount: this.state.amount,
-          members: []
-        }]])
+        items: temp
       });
     }
     this.state.name = '';
@@ -107,7 +120,7 @@ class App extends React.Component {
   }
 
   deleteItem(index) {
-    delete this.state.items[index];
+    this.state.items.splice(0, 1);
     this.setState({
       items: this.state.items
     });
@@ -172,23 +185,21 @@ class App extends React.Component {
   }
 
   addMember (itemArray) {
+    var temp = this.state.members;
     this.memberExist(this.state.member, (exist) => {
       this.setState({
         memberExist: exist
       });
       if (!exist) {
+        temp.push([this.state.member]);
         this.setState({
-          members: this.state.members.concat([[this.state.member]])
+          members: temp
         });
       }
     });
     this.state.member = '';
   }
 
-
-  componentDidMount() {
-    this.getRecentTrip();
-  }
 
   getRecentTrip() {
     let user = this.state;
@@ -236,7 +247,6 @@ class App extends React.Component {
     this.state.items.forEach(function(itemArr) {
       var itemObj = itemArr[0];
       var eachPrice = itemObj.amount / itemObj.members.length;
-      console.log('....??', itemObj);
       if (itemObj.members.length === 0) {
         // itemObj.members = [].concat.apply([], this.state.members);
         itemObj.members.push('Testing');
@@ -274,7 +284,7 @@ class App extends React.Component {
     let membersCurrIndex = members.indexOf(member);
 
     if (membersCurrIndex < 0) {
-      items[index][0].members = members.concat([member]);
+      items[index][0].members = members.push([member]);
     } else {
       members.splice(membersCurrIndex, 1);
     }
@@ -319,6 +329,7 @@ class App extends React.Component {
   }
 
   render() {
+    console.log('index members', this.state.members);
     return (
       <div className='site-container'>
         <Router>
@@ -419,13 +430,6 @@ class App extends React.Component {
         </Router>
       </div>
     );
-  }
-
-  componentWillMount() {
-    this.getUsersFromFacebook();
-    this.updateDimensions();
-    window.addEventListener('resize', this.updateDimensions.bind(this));
-    Util.verify(this.verifyAuthentication);
   }
 }
 
