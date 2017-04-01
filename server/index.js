@@ -70,11 +70,6 @@ passport.use(new FacebookStrategy({
         email: profile._json.email,
         picture: profile._json.picture.data.url
       };
-
-      console.log('====================== user name', profile._json, '-----type of', typeof profile)
-      console.log(')))((((((()))))))', userInfo)
-      localStorage.user.picture = userInfo.picture
-      
       db.createNewUser(userInfo);
       return cb(null, userInfo);
     });
