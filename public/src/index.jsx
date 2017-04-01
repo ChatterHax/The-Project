@@ -93,7 +93,8 @@ class App extends React.Component {
       isAuthenticated: userInfo.isAuthenitcated,
       username: userInfo.name || '',
       members: temp,
-      fb_id: userInfo.fb_id || ''
+      fb_id: userInfo.fb_id || '',
+      photoUrl: userInfo.fb_id || ''
     });
     console.log('verify members 2', this.state.members);
   }
