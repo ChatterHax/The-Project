@@ -51,6 +51,7 @@ class AddMember extends React.Component {
               ></a>
             </div>
             <div className='receipt-members-list'>
+              {console.log('props.members', this.props)}
               {this.props.members.map((member, index) => {
                 return (
                   <div
