@@ -31,7 +31,6 @@ app.use(fileUpload());
 
 // Use application-level middleware for common functionality, including
 // logging, parsing, and session handling.
-app.use(require('morgan')('combined'));
 app.use(require('cookie-parser')());
 app.use(require('express-session')({
   secret: process.env.SESSION_SECRET || 'thisCouldBeAnything',
@@ -64,16 +63,11 @@ passport.use(new FacebookStrategy({
     process.nextTick(function () {
       let userInfo = {
         name: profile._json.first_name + " " + profile._json.last_name,
-        firstName: profile._json.first_name,
-        lastName: profile._json.last_name,
         fb_id: profile._json.id,
         token: accessToken,
         email: profile._json.email,
         picture: profile._json.picture.data.url
       };
-      console.log('====================== user name', profile._json, '-----type of', typeof profile)
-      console.log(')))((((((()))))))', userInfo)
-      localStorage.user.picture = userInfo.picture
       db.createNewUser(userInfo);
       return cb(null, userInfo);
     });
@@ -162,10 +156,6 @@ app.get('*', checkAuthentication, authHelper, (req, res) => {
   } else {
     res.sendFile(path.resolve(__dirname, '..', 'public', 'dist', 'index.html'));
   }
-});
-
-app.get('/testing', function(req, res) {
-  console.log('=========================================hello=====')
 });
 
 //To be used for testing and seeing requests
